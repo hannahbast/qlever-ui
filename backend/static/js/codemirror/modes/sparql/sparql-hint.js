@@ -548,7 +548,7 @@ function replaceQueryPlaceholders(completionQuery, word, prefixes, lines, words)
                 // HACK (Hannah, 23.02.2021): Replace <pred1>/<pred2>* by
                 // <pred1>|<pred2> in object completion.
                 words[1] = words[1].replace(/^([^ \/]+)\/([^ \/]+)\*$/, "$1|$2");
-                console.log("HACK: CURRENT_PREDICATE -> ", words[1]);
+                // console.log("HACK: CURRENT_PREDICATE -> ", words[1]);
 
 		sparqlLines = sparqlLines.replace(/%CURRENT_PREDICATE%/g, words[1]);
 	}
@@ -663,11 +663,9 @@ function getQleverSuggestions(sparqlQuery, prefixesRelation, appendix, nameList,
 		// do the limits for the scrolling feature
 		sparqlQuery += "\nLIMIT " + size + "\nOFFSET " + lastSize;
 
-        // HACK(Hannah 14.08.2020): query rewrite for KEYWORDS from
-        // helper.js also for completion queries.
-        sparqlQuery = sparqlQuery.replace(
-          /FILTER\s+keywords\((\?[\w_]+),\s*(\"[^\"]+\")\)\s*\.?\s*/ig,
-          '?kwm ql:contains-entity $1 . ?kwm ql:contains-word $2 . ');
+    // HACK(Hannah 14.08.2020 + 30.03.2021): rewrite query also for completion
+    // queries.  helper.js also for completion queries.
+    sparqlQuery = rewriteQueryHack(sparqlQuery);
 
 		log('Getting suggestions from QLever:\n' + sparqlQuery, 'requests');
 
@@ -750,10 +748,30 @@ function getQleverSuggestions(sparqlQuery, prefixesRelation, appendix, nameList,
             // the reversed predicate.
 						var reversedIndex = data.selected.indexOf("?qleverui_reversed");
             var reversed = (reversedIndex != -1 && result[reversedIndex] == 1);
-            dynamicSuggestions.push({ displayText: (reversed ? "^" : "") + result[0] + appendix,
-                                      completion: (reversed ? "^" : "") + result[0] + appendix,
+            var displayText = (reversed ? "^" : "") + result[0] + appendix;
+            var completion = (reversed ? "^" : "") + result[0] + appendix;
+            dynamicSuggestions.push({ displayText: displayText,
+                                      completion: completion,
                                       name: entityName + (reversed ? " (reversed)" : ""),
                                       altname: altEntityName });
+            // HACK Hannah 23.02.2021: Add transitive suggestions (hand-picked).
+            // console.log("DISPLAY TEXT: \"" + displayText + "\"");
+            if (displayText == "wdt:P31 ") {
+              dynamicSuggestions.push({ displayText: displayText.trim() + "/wdt:P279* ",
+                                        completion: completion.trim() + "/wdt:P279* ",
+                                        name: entityName + " (transitive)",
+                                        altname: altEntityName });
+            }
+            if (displayText == "wdt:P131 ") {
+              dynamicSuggestions.push({ displayText: "wdt:P131+ ",
+                                        completion: "wdt:P131+ ",
+                                        name: entityName + " (transitive)",
+                                        altname: altEntityName });
+            }
+            // dynamicSuggestions.push({ displayText: (reversed ? "^" : "") + result[0] + appendix,
+            //                           completion: (reversed ? "^" : "") + result[0] + appendix,
+            //                           name: entityName + (reversed ? " (reversed)" : ""),
+            //                           altname: altEntityName });
 					}
 
 				} else {
