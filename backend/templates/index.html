@@ -214,16 +214,16 @@
                         <h4>Knowledge base index</h4>
                         <br>
                         <table class="table">
-                        	<tr><th>Index name:</th><td><b><span id="kbname"></span></b></td></tr>
-							<tr><th>Dataset</th><td>Number of triples: <b><span id="ntriples"></span></b><br><div id="kbstats"></div></td></tr>
+                        	<!-- <tr><th>Index name:</th><td><b><span id="kbname"></span></b></td></tr> -->
+							<tr><th>Statistics</th><td>Number of triples: <b><span id="ntriples"></span></b><br><div id="kbstats"></div></td></tr>
                         </table>
                     </div>
                     <div class="col-md-6">
                         <h4>Fulltext index</h4>
                         <br>
                         <table class="table">
-                            <tr><th>Index name:</th><td><b><span id="textname"></span></b></td></tr>
-                            <tr><th>Dataset</th><td>
+                            <!-- <tr><th>Index name:</th><td><b><span id="textname"></span></b></td></tr> -->
+                            <tr><th>Statistics</th><td>
 	                            Number of distinct text records: <b><span id="nrecords"></span></b><br>
 								Number of distinct word occurrences: <b><span id="nwo"></span></b><br>
 								Number of distinct entity occurrences: <b><span id="neo"></span></b>
@@ -269,7 +269,7 @@
                 <div class="row">
                     <div id="editorArea" class="col-md-12">
                         <!-- The main editor (code mirror textarea) -->
-                        <textarea id="query" class="form-control" placeholder="Start by typing SELECT or PREFIX ...">{% if prefill and not request.GET.test %}{{ prefill }}{% endif %}</textarea><br>
+                        <textarea id="query" class="form-control" placeholder="Type a SPARQL query using Autocompletion - start by typing S for SELECT">{% if prefill and not request.GET.test %}{{ prefill }}{% endif %}</textarea><br>
                     </div>
                      <div class="col-md-4" id="help" style="display:none;">
                         <div id="uiHelp">
@@ -404,7 +404,7 @@
                         </select>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" id="name_service"> Automatically add names to result
+                                <input type="checkbox" id="name_service" checked> Automatically add names to result
                             </label>
                         </div>
                         <div class="checkbox">
@@ -654,7 +654,7 @@
 		  </div>
 		</div>
 
-        <div class="modal" tabindex="-1" role="dialog" id="share">
+    <div class="modal" tabindex="-1" role="dialog" id="share">
 		  <div class="modal-dialog" role="document" style="width: 80%;">
 		    <div class="modal-content">
 		      <div class="modal-header">
@@ -664,42 +664,73 @@
 		        </button>
 		      </div>
 		      <div class="modal-body">
-                <div>
-                    <label>Short URL</label>
-                    <div class="input-group">
-                        <input type="text" id="prettyLink" class="form-control" readonly>
-                        <span class="input-group-btn">
-                            <button class="btn btn-default copy-clipboard-button">
-                                <i class="glyphicon glyphicon-copy"></i> Copy
-                            </button>
-                        </span>                    
-                    </div>
-                    <div class="ok-text collapse">
-                        <i class="glyphicon glyphicon-ok"></i> Copied link to clipboard
-                    </div>
-                </div>
-                <br>
-                <div>
-                    <label>As querystring</label>
-                    <div class="input-group">
-                        <input type="text" id="queryStringLink" class="form-control" readonly>
-                        <span class="input-group-btn">
-                            <button class="btn btn-default copy-clipboard-button">
-                                <i class="glyphicon glyphicon-copy"></i> Copy
-                            </button>
-                        </span>
-                    </div>
-                    <div class="ok-text collapse">
-                        <i class="glyphicon glyphicon-ok"></i> Copied link to clipboard
-                    </div>
-                </div>
-		      </div>
+            <div>
+              <label>URL to this query in the QLever UI (short, with query hash)</label>
+              <div class="input-group">
+                <input type="text" id="prettyLink" class="form-control" readonly>
+                <span class="input-group-btn">
+                  <button class="btn btn-default copy-clipboard-button">
+                    <i class="glyphicon glyphicon-copy"></i> Copy
+                  </button>
+                </span>                    
+              </div>
+              <div class="ok-text collapse">
+                <i class="glyphicon glyphicon-ok"></i> Copied link to clipboard
+              </div>
+            </div>
+            <br>
+            <div>
+              <label>URL to this query in the QLever UI (long, with full query string)</label>
+              <div class="input-group">
+                <input type="text" id="queryStringLink" class="form-control" readonly>
+                <span class="input-group-btn">
+                  <button class="btn btn-default copy-clipboard-button">
+                    <i class="glyphicon glyphicon-copy"></i> Copy
+                  </button>
+                </span>
+              </div>
+              <div class="ok-text collapse">
+                <i class="glyphicon glyphicon-ok"></i> Copied link to clipboard
+              </div>
+            </div>
+            <br>
+            <div>
+              <label>URL for API call (for use in web apps, etc.)</label>
+              <div class="input-group">
+                <input type="text" id="apiCallUrl" class="form-control" readonly>
+                <span class="input-group-btn">
+                  <button class="btn btn-default copy-clipboard-button">
+                    <i class="glyphicon glyphicon-copy"></i> Copy
+                  </button>
+                </span>
+              </div>
+              <div class="ok-text collapse">
+                <i class="glyphicon glyphicon-ok"></i> Copied link to clipboard
+              </div>
+            </div>
+            <br>
+            <div>
+              <label>Command line for API call (using curl)</label>
+              <div class="input-group">
+                <input type="text" id="apiCallCommandLine" class="form-control" readonly>
+                <span class="input-group-btn">
+                  <button class="btn btn-default copy-clipboard-button">
+                    <i class="glyphicon glyphicon-copy"></i> Copy
+                  </button>
+                </span>
+              </div>
+              <div class="ok-text collapse">
+                <i class="glyphicon glyphicon-ok"></i> Copied link to clipboard
+              </div>
+            </div>
+          </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 		      </div>
 		    </div>
 		  </div>
-		</div>
+	  </div>
+  </div>
         
         <br>
         <footer class="footer">
@@ -711,7 +742,7 @@
                      <a href="https://github.com/ad-freiburg/QLever" target="_blank">The QLever SPARQL Engine</a>, 
                      <a href="https://github.com/ad-freiburg/qleverUI" target="_blank">QLever UI</a>,
                      <a href="https://github.com/ad-freiburg/qlever-mapui" target="_blank">QLever Map UI</a>,
-                     <a href="https://github.com/ad-freiburg/qlever-evaluation" target="_blank">QLever evaluation</a>
+                     <a href="https://github.com/ad-freiburg/qlever-evaluation" target="_blank">QLever Evaluation</a>
                      &ndash; Publications:
                      <a
                        href="https://ad-publications.cs.uni-freiburg.de/CIKM_qlever_BB_2017.pdf" target="_blank">SPARQL+Text</a>,
