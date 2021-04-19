@@ -200,13 +200,24 @@ $(document).ready(function () {
     $("#sharebtn").click(function () {
         // generate pretty link
         $.post('/api/share', { 'content': editor.getValue() }, function (result) {
-            log('Got pretty link from backend', 'other');
-            var baseLocation = window.location.origin + window.location.pathname.split('/').slice(0, 2).join('/') + '/';
+          log('Got pretty link from backend', 'other');
+          var baseLocation = window.location.origin + window.location.pathname.split('/').slice(0, 2).join('/') + '/';
+          // Query from editor in one line with single whitespace and no
+          // trailing full stops before closing braces.
+          var editorStringCleaned = editor.getValue()
+                                     .replace(/\s+/g, " ")
+                                     .replace(/\s*\.\s*}/g, " }")
+                                     .trim();
 
-            $(".ok-text").collapse("hide");
-            $("#share").modal("show");
-            $("#prettyLink").val(baseLocation + result.link);
-            $("#queryStringLink").val(baseLocation + "?" + result.queryString);
+          $(".ok-text").collapse("hide");
+          $("#share").modal("show");
+          $("#prettyLink").val(baseLocation + result.link);
+          $("#queryStringLink").val(baseLocation + "?" + result.queryString);
+          $("#apiCallUrl").val(BASEURL + "?" + result.queryString);
+          $("#apiCallCommandLine").val(
+              "curl -Gs " + BASEURL
+               + " --data-urlencode \"query=" + editorStringCleaned + "\""
+               + " --data-urlencode \"action=tsv_export\"");
         }, 'json');
 
         if (editor.state.completionActive) { editor.state.completionActive.close(); }
@@ -306,7 +317,9 @@ function processQuery(query, showStatus, element) {
             let mapViewButton = '';
             if (result.res.length > 0 && /wktLiteral/.test(result.res[0][columns.length - 1])) {
                 let mapViewUrl = 'http://qlever.cs.uni-freiburg.de/mapui/index.html?';
-                let params = $.param({ query: editor.getValue(), backend: BASEURL });
+                // HACK(Hannah, 30.03.2021): Also rewrite query send to Map UI.
+                let query = rewriteQueryHack(editor.getValue());
+                let params = $.param({ query: query, backend: BASEURL });
                 mapViewButton = `<a class="btn btn-default" href="${mapViewUrl}${params}" target="_blank"><i class="glyphicon glyphicon-map-marker"></i> Map view</a>`;
             }
             if (nofRows < parseInt(result.resultsize)) {
